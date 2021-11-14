@@ -3,6 +3,7 @@
 from utils.MCForecastTools import MCSimulation
 import pandas as pd
 import numpy as np
+import hvplot.pandas
 
 # Monte Carlo functions
 def configure_monte_carlo(dataframe, weights, num_simulations, num_trading_days):
@@ -22,6 +23,7 @@ def plot_simulation_outcomes(simulation_input_df):
     simulation_plot = simulation_input_df.plot_simulation()
     return simulation_plot
 
+
 def plot_distribution(simulation_input_df):
     sim_dist_plot = simulation_input_df.plot_distribution()
     return sim_dist_plot
@@ -29,3 +31,8 @@ def plot_distribution(simulation_input_df):
 def get_monte_summary(simulation_input_df):
     summary_stats = simulation_input_df.summarize_cumulative_return()
     return summary_stats
+
+def get_daily_returns(simulation_input_df, ticker):
+    daily_returns = simulation_input_df.portfolio_data[ticker]['daily_return'].rename_axis(mapper = ticker, axis = 1)
+    return daily_returns
+    
