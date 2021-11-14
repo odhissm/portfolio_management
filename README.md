@@ -37,7 +37,7 @@ Before running the application first install the following dependencies.
 ```
 run the web application by typing the following url on your web browser
 
-https://mybinder.org/v2/gh/odhissm/passive_investing.git/HEAD
+https://mybinder.org/v2/gh/odhissm/portfolio_management.git/HEAD
 
 ---
 
