@@ -3,6 +3,7 @@ import datetime as dt
 from dotenv import load_dotenv
 import sys
 import os
+import pandas as pd
 
 #import environment variables
 load_dotenv()

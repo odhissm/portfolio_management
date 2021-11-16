@@ -3,6 +3,9 @@
 from utils.MCForecastTools import MCSimulation
 import pandas as pd
 import numpy as np
+import plotly as pty
+import plotly.express as px
+import hvplot
 import hvplot.pandas
 
 # Monte Carlo functions
@@ -22,7 +25,6 @@ def run_monte_carlo(simulation_input_df):
 def plot_simulation_outcomes(simulation_input_df):
     simulation_plot = simulation_input_df.plot_simulation()
     return simulation_plot
-
 
 def plot_distribution(simulation_input_df):
     sim_dist_plot = simulation_input_df.plot_distribution()

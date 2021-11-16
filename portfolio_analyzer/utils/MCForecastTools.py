@@ -5,8 +5,11 @@ import os
 import alpaca_trade_api as tradeapi
 import datetime as dt
 import pytz
+import matplotlib.pyplot as plt
 import hvplot
 import hvplot.pandas
+import plotly as pty
+import plotly.express as px
 
 class MCSimulation:
     """
@@ -152,11 +155,12 @@ class MCSimulation:
         
         # Use the `plot` function to create a probability distribution histogram of simulated ending prices
         # with markings for a 95% confidence interval
+        fig, ax = plt.subplots()
         plot_title = f"Distribution of Final Cumuluative Returns Across All {self.nSim} Simulations"
-        plt = self.simulated_return.iloc[-1, :].plot(kind='hist', bins=10,density=True,title=plot_title)
-        plt.axvline(self.confidence_interval.iloc[0], color='r')
-        plt.axvline(self.confidence_interval.iloc[1], color='r')
-        return plt
+        ax = self.simulated_return.iloc[-1, :].plot(kind='hist', bins=10,density=True,title=plot_title)
+        ax.axvline(self.confidence_interval.iloc[0], color='r')
+        ax.axvline(self.confidence_interval.iloc[1], color='r')
+        return fig
     
     def summarize_cumulative_return(self):
         """
