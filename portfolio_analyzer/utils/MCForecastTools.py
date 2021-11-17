@@ -155,11 +155,15 @@ class MCSimulation:
         
         # Use the `plot` function to create a probability distribution histogram of simulated ending prices
         # with markings for a 95% confidence interval
-        fig, ax = plt.subplots()
+        
+
         plot_title = f"Distribution of Final Cumuluative Returns Across All {self.nSim} Simulations"
-        ax = self.simulated_return.iloc[-1, :].plot(kind='hist', bins=10,density=True,title=plot_title)
-        ax.axvline(self.confidence_interval.iloc[0], color='r')
-        ax.axvline(self.confidence_interval.iloc[1], color='r')
+        dist_df = pd.DataFrame(self.simulated_return.iloc[-1, :])
+        #fig = px.histogram(dist_df, labels={
+         #            "value": "Cumulative Returns (x)",
+          #           "count": "occurences",
+           #          "variable": "Trading Days"})
+        fig = px.box(dist_df, points = 'all')
         return fig
     
     def summarize_cumulative_return(self):
