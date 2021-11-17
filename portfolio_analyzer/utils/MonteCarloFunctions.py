@@ -1,6 +1,6 @@
 # Module to define Monte Carlo functions that will be utilized repeatedly throughout the project
 
-from utils.MCForecastTools import MCSimulation
+from MCForecastTools import MCSimulation
 import pandas as pd
 import numpy as np
 import plotly as pty
