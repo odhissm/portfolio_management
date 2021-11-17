@@ -106,7 +106,7 @@ def runUpdatedAnalysis(new_holdings_df, initial_filtered_bar, comparison_std_bar
     new_mc_weights = list(new_holdings_df.weight / 100)
     # #display(initial_mc_weights)
     num_simulations = 100
-    num_trading_days = 252 * 5
+    num_trading_days = 252 * 3
 
     # Creating initial MC Simulation DataFrames
     # For ARKK ETF stocks (before updating)

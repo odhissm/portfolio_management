@@ -112,7 +112,7 @@ def runFirstAnalysis():
     
     # #display(initial_mc_weights)
     num_simulations = 100
-    num_trading_days = 252 * 5
+    num_trading_days = 252 * 3
 
     # Creating initial MC Simulation DataFrames
     # For ARKK ETF stocks (before updating)
@@ -281,20 +281,14 @@ def runFirstAnalysis():
     st.subheader('Please select below if you would like to drop or change any stocks to see how it would affect the portfolio:')
     
     with st.form('drop_stock'):
-        #drop_change = st.selectbox('Would you like to drop or change out a stock?', ('Drop', 'Change out'))
-        #if drop_change == 'Drop':
         updated_holdings_df = pd.DataFrame()
         drop_choice = st.selectbox('Select the stock to drop', options=initial_holdings_df['ticker'])
         updated_holdings_df = initial_holdings_df[initial_holdings_df.ticker != drop_choice]
         updated_holdings_df.weight = updated_holdings_df.weight + ((100 - updated_holdings_df.weight.sum()) / len(updated_holdings_df.index))
-        #elif drop_change == 'Change out':
-            #    change_choice = st.selectbox('Select the stock to change out', options = initial_holdings_df['ticker'])
-             #   new_stock = st.text_input(f'Stock to replace {change_choice}', 'e.g. SPY')
-             #   updated_holdings_df = initial_holdings_df['ticker'].replace({change_choice : new_stock})
-             #   st.write(updated_holdings_df['ticker'])
         update_analyses = st.form_submit_button('Run analyses on updated portfolio')
         if update_analyses:
             runUpdatedAnalysis(updated_holdings_df, initial_filtered_bar, comparison_std_barplot, combined_sharpe_plot, stacked_bars_plot, initial_portfolio_cum_plot, initial_combined_median_plot, portfolio_intial_distribution_plot)
+    
     with st.form('switch_stock'):
         updated_holdings_df = pd.DataFrame()
         change_choice = st.selectbox('Select the stock to change out', options = initial_holdings_df['ticker'])
