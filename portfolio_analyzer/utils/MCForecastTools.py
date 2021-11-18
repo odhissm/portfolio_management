@@ -1,14 +1,8 @@
 # Import libraries and dependencies
 import numpy as np
 import pandas as pd
-import os
-import alpaca_trade_api as tradeapi
 import datetime as dt
-import pytz
 import matplotlib.pyplot as plt
-import hvplot
-import hvplot.pandas
-import plotly as pty
 import plotly.express as px
 
 class MCSimulation:
@@ -158,12 +152,14 @@ class MCSimulation:
         
 
         plot_title = f"Distribution of Final Cumuluative Returns Across All {self.nSim} Simulations"
-        dist_df = pd.DataFrame(self.simulated_return.iloc[-1, :])
-        #fig = px.histogram(dist_df, labels={
-         #            "value": "Cumulative Returns (x)",
-          #           "count": "occurences",
-           #          "variable": "Trading Days"})
-        fig = px.box(dist_df, points = 'all')
+        
+
+        fig = px.histogram(self.simulated_return.iloc[-1, :], title = plot_title, labels={'value' : 'Cumulative Returns', 'count' : 'Occurences', 'legend' : ''})
+        
+
+        #plt = self.simulated_return.iloc[-1, :].plot(kind='hist', bins=10,density=True,title=plot_title)
+        #plt.axvline(self.confidence_interval.iloc[0], color='r')
+        #plt.axvline(self.confidence_interval.iloc[1], color='r')
         return fig
     
     def summarize_cumulative_return(self):
