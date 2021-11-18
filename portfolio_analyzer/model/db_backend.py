@@ -267,16 +267,22 @@ def delete_one(conn, ticker, table_name):
             .format(ticker, table_name))        
         
     
-def import_portfolio_holding(holdings_symbol, holdings_url):
+def import_portfolio_holding(holdings_symbol):
         
-    # make an API call to get the jason file of the holding and store in a variable 'response'
-    response = requests.get(holdings_url, params = {'symbol' : holdings_symbol}).json()
+    if (holdings_symbol == 'ARKK'):
+        holdings_url = 'https://arkfunds.io/api/v2/etf/holdings' 
+        
+       
+    # make an API call to get the jason file of the holding and store in a variable 'response'   
+    funds_portfolio = requests.get(holdings_url, params = {'symbol' : holdings_symbol}).json()
     
     # Create a dataframe of the holding response
-    holdings_df = pd.DataFrame(response['holdings'])
+    #funds_portfolio_df = pd.DataFrame(funds_portfolio['holdings']).dropna(axis=0)
     
     #create a new dataframe from holdings_df and select only the following columns; ticker, weight and company    
-    holdings_ticker_weight_df = holdings_df[['ticker', 'weight', 'company']]
+    #funds_portfolio_df = funds_portfolio_df[['ticker', 'weight', 'company']] 
     
-    return holdings_ticker_weight_df
+    return funds_portfolio
+
+
     
