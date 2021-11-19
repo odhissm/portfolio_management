@@ -65,6 +65,8 @@ def runFirstAnalysis():
 
     initial_filtered_bar = initial_filtered_df.hvplot.bar(x='ticker', y = 'weight', hover_color = 'red', rot=90, title = 'Stock tickers and their corresponding weights in the portfolio')
 
+    st.subheader('Initial ARKK portfolio analysis vs. QQQ')
+    
     st.bokeh_chart(hv.render(initial_filtered_bar, backend='bokeh'))
 
 
@@ -111,8 +113,8 @@ def runFirstAnalysis():
     initial_mc_weights = list(initial_holdings_df.weight / 100)
     
     # #display(initial_mc_weights)
-    num_simulations = 5
-    num_trading_days = 50 
+    num_simulations = 25
+    num_trading_days = 252 
 
     # Creating initial MC Simulation DataFrames
     # For ARKK ETF stocks (before updating)
@@ -304,26 +306,27 @@ def runFirstAnalysis():
         change_choices = st.multiselect('Select up to 3 stocks to change out', options = initial_holdings_df['ticker'])
         col1, col2, col3 = st.columns(3)
         col1 = st.text_input('Replacement stock 1')
-        col2 = st.text_input('Replacement stock 2 (if applicable')
+        col2 = st.text_input('Replacement stock 2 (if applicable)')
         col3 = st.text_input('Replacement stock 3 (if applicable)')
-        updated_holdings_df['ticker'].replace({change_choices[0] : col1}, inplace=True)
-        if change_choices[1]:
-            updated_holdings_df['ticker'].replace({change_choices[1] : col2}, inplace=True)
-        if change_choices[2]:
-            updated_holdings_df['ticker'].replace({change_choices[2] : col3}, inplace=True)
-
-        if len(change_choices) > 3:
-            st.write('No more than 3 stocks can be replaced')
-            st.stop()
+        
 
 
 
 
         update_analyses = st.form_submit_button('Run analyses on updated portfolio')
         if update_analyses:
-            st.write(updated_holdings_df)
+            updated_holdings_df['ticker'].replace({change_choices[0] : col1}, inplace=True)
+            if change_choices[1]:
+                updated_holdings_df['ticker'].replace({change_choices[1] : col2}, inplace=True)
+            if change_choices[2]:
+                updated_holdings_df['ticker'].replace({change_choices[2] : col3}, inplace=True)
+
+            if len(change_choices) > 3:
+                st.write('No more than 3 stocks can be replaced')
+                st.stop()
+            #st.write('Once a stock is dropped the change out stocks function will not work')
             runUpdatedAnalysis(updated_holdings_df, initial_filtered_bar, comparison_std_barplot, combined_sharpe_plot, stacked_bars_plot, initial_portfolio_cum_plot, initial_combined_median_plot, portfolio_intial_distribution_plot)    
-    
+            #st.stop()
     
     #return initial_holdings_df, initial_filtered_bar, comparison_std_barplot, combined_sharpe_plot, stacked_bars_plot, initial_portfolio_cum_plot, initial_combined_median_plot, portfolio_intial_distribution_plot
 

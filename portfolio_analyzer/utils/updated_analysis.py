@@ -59,7 +59,7 @@ def runUpdatedAnalysis(new_holdings_df, initial_filtered_bar, comparison_std_bar
     # %%
     # For our purposes we want to focus on the 'ticker','weight', and 'company' columns of the dataframe.  This will allow us to perform historical research with the Alpaca API as well as plot the weights of the portfolio stocks.
     new_filtered_df = new_holdings_df[['ticker', 'weight', 'company']].sort_values(by = 'weight')
-    st.write(new_filtered_df)
+    #st.write(new_filtered_df)
 
     # Note that for our Monte Carlo simulations, we will need to divide the weights column by 100 since the sum of weights for the simulation needs to be 1, and the dataframe is configured for the sum to be 100.
 
@@ -87,7 +87,7 @@ def runUpdatedAnalysis(new_holdings_df, initial_filtered_bar, comparison_std_bar
 
     #ARKK broken up into individual stocks:
     new_portfolio_df = apf.get_historical_dataframe(new_tickers, start_date, end_date, timeframe)
-    st.write(new_portfolio_df)
+    #st.write(new_portfolio_df)
 
 
     # %% [markdown]
@@ -105,8 +105,8 @@ def runUpdatedAnalysis(new_holdings_df, initial_filtered_bar, comparison_std_bar
     # Dividing the weights by 100
     new_mc_weights = list(new_holdings_df.weight / 100)
     # #display(initial_mc_weights)
-    num_simulations = 5
-    num_trading_days = 50 
+    num_simulations = 25
+    num_trading_days = 252 
 
     # Creating initial MC Simulation DataFrames
     # For ARKK ETF stocks (before updating)
@@ -154,7 +154,7 @@ def runUpdatedAnalysis(new_holdings_df, initial_filtered_bar, comparison_std_bar
     # Plot the ratios
 
     new_portfolio_sharpe_plot = new_portfolio_sharpe.hvplot.bar(xlabel = 'Tickers', ylabel = 'Sharpe Ratios of new portfolio stocks', title = 'Sharpe Ratios of initial portfolio stocks vs. QQQ and ARKK', color = 'red', label = 'Initial Portfolio Stocks', rot = 90)
-    st.bokeh_chart(hv.render(new_portfolio_sharpe_plot, backend='bokeh'))
+    #st.bokeh_chart(hv.render(new_portfolio_sharpe_plot, backend='bokeh'))
 
 
 
@@ -196,7 +196,7 @@ def runUpdatedAnalysis(new_holdings_df, initial_filtered_bar, comparison_std_bar
     new_portfolio_median_outcomes = new_portfolio_sim_returns.median(axis=1)
     new_median_initial_plot = new_portfolio_median_outcomes.hvplot(ylabel = 'Median returns', xlabel = 'Days of projection', title = f'Median returns from {num_simulations} simulations over {num_trading_days} trading days for our new portfolio, QQQ, and ARKK', label = 'New Portfolio')
     new_combined_median_plot = new_median_initial_plot * initial_combined_median_plot
-    st.bokeh_chart(hv.render(new_median_initial_plot, backend='bokeh'))
+    #st.bokeh_chart(hv.render(new_median_initial_plot, backend='bokeh'))
     st.bokeh_chart(hv.render(new_combined_median_plot, backend = 'bokeh'))
 
 
@@ -208,15 +208,17 @@ def runUpdatedAnalysis(new_holdings_df, initial_filtered_bar, comparison_std_bar
     # this plot will be variable whereas the 'ARKK' and 'QQQ' PLOT
 
     new_distribution_plot = mcf.plot_distribution(new_portfolio_sim_input)
+    st.subheader('Distribution of simulation returns for our updated portfolio')
     st.plotly_chart(new_distribution_plot, sharing="streamlit", title = 'Distribution of cumulative returns across all simulations for the new portfolio')
 
     
     # %%
     # Describe the MCForecast Summary
     new_portfolio_simulation_summary = mcf.get_monte_summary(new_portfolio_sim_input)
+    st.subheader('Summary of returns from the MC simulations on our updated portfolio')
     st.table(new_portfolio_simulation_summary)
     
-    return new_filtered_df, new_portfolio_std_barplot, new_portfolio_sharpe_plot, new_stacked_bars_plot, new_portfolio_cum_plot, new_median_initial_plot, new_distribution_plot, new_portfolio_simulation_summary
+    
 
 
 
