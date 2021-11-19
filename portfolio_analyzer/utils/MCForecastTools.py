@@ -163,7 +163,7 @@ class MCSimulation:
          #            "value": "Cumulative Returns (x)",
           #           "count": "occurences",
            #          "variable": "Trading Days"})
-        fig = px.box(dist_df, points = 'all')
+        fig = px.box(dist_df, points = 'all', labels = {"value": "Cumulative Returns (x)",  "count": "occurences", "variable": "Trading Days"})
         return fig
     
     def summarize_cumulative_return(self):

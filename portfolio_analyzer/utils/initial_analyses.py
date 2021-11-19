@@ -111,8 +111,8 @@ def runFirstAnalysis():
     initial_mc_weights = list(initial_holdings_df.weight / 100)
     
     # #display(initial_mc_weights)
-    num_simulations = 100
-    num_trading_days = 252 * 5
+    num_simulations = 5
+    num_trading_days = 50 
 
     # Creating initial MC Simulation DataFrames
     # For ARKK ETF stocks (before updating)
@@ -220,7 +220,7 @@ def runFirstAnalysis():
                                                                 ylabel = 'Returns', xlabel = 'Date', legend = 'left', fontsize = {'legend' : '8pt'}, frame_height = 250, frame_width = 750)
     # For 'ARKK' as  whole
     arkk_returns_cumprod = (1 + arkk_daily_returns).cumprod()
-    arkk_cum_plot = arkk_returns_cumprod.hvplot(kind = 'line', rot=90, title = 'Cumulative returns for ARKK vs QQQ', ylabel = 'Returns', xlabel = 'Date', label = 'ARKK')
+    arkk_cum_plot = arkk_returns_cumprod.hvplot(kind = 'line', rot=90, title = 'Historical cumulative returns for ARKK vs QQQ', ylabel = 'Returns', xlabel = 'Date', label = 'ARKK', color='blue')
     # For 'QQQ' as a whole
     qqq_returns_cumprod = (1 + qqq_daily_returns).cumprod()
     qqq_cum_plot = qqq_returns_cumprod.hvplot(kind = 'line', rot=90, title = 'Cumulative returns for QQQ', ylabel = 'Returns', xlabel = 'Date', label = 'QQQ')
@@ -249,8 +249,8 @@ def runFirstAnalysis():
     # Plotting the median projected returns via the MCForecast projections
     qqq_median_outcomes = qqq_sim_returns.median(axis=1)
     arkk_intial_median_outcomes = arkk_initial_sim_returns.median(axis=1)
-    qqq_median_plot = qqq_median_outcomes.hvplot(ylabel = 'Median returns', xlabel = 'Days of projection', title = f'Median returns from {num_simulations} simulations over {num_trading_days} trading days for QQQ vs ARKK', label = 'QQQ')
-    arkk_median_initial_plot = arkk_intial_median_outcomes.hvplot(ylabel = 'Median returns', xlabel = 'Days of projection', title = f'Median returns from {num_simulations} simulations over {num_trading_days} trading days for QQQ vs ARKK', label = 'ARKK')
+    qqq_median_plot = qqq_median_outcomes.hvplot(ylabel = 'Median returns', xlabel = 'Days of projection', title = f'Median returns from {num_simulations} simulations over {num_trading_days} trading days for QQQ vs ARKK', label = 'QQQ', color='red')
+    arkk_median_initial_plot = arkk_intial_median_outcomes.hvplot(ylabel = 'Median returns', xlabel = 'Days of projection', title = f'Median returns from {num_simulations} simulations over {num_trading_days} trading days for QQQ vs ARKK', label = 'ARKK', color='blue')
     initial_combined_median_plot = qqq_median_plot * arkk_median_initial_plot
     st.bokeh_chart(hv.render(initial_combined_median_plot, backend='bokeh'))
 
@@ -260,12 +260,14 @@ def runFirstAnalysis():
     # This is the plot for the simulations using the individual stocks within ARKK and can be manipulated...
     # this plot will be variable whereas the 'ARKK' and 'QQQ' PLOT
     portfolio_intial_distribution_plot = mcf.plot_distribution(portfolio_initial_sim_input)
+    st.subheader('Distribution plot of simulated returns for ARKK')
     st.plotly_chart(portfolio_intial_distribution_plot, sharing="streamlit")
 
 
 
     # %%
     qqq_distribution_plot = mcf.plot_distribution(qqq_sim_input)
+    st.subheader('Distribution plot of simulated returns for QQQ')
     st.plotly_chart(qqq_distribution_plot, sharing="streamlit", title = 'Distribution of cumulative returns across all simulations for QQQ')
 
 
@@ -274,7 +276,10 @@ def runFirstAnalysis():
     # Describe the MCForecast Summary
     portfolio_initial_simulation_summary = mcf.get_monte_summary(portfolio_initial_sim_input)
     qqq_simulation_summary = mcf.get_monte_summary(qqq_sim_input)
+    
+    st.subheader('Summary table of Cumulative Returns from our simulations for ARKK')
     st.table(portfolio_initial_simulation_summary)
+    st.subheader('Summary table of Cumulative Returns from our simulations for QQQ')
     st.table(qqq_simulation_summary)
 
     # Adding in inputs to alter the portfolio for new analyses
@@ -287,23 +292,36 @@ def runFirstAnalysis():
         drop_choice = st.selectbox('Select the stock to drop', options=initial_holdings_df['ticker'])
         updated_holdings_df = initial_holdings_df[initial_holdings_df.ticker != drop_choice]
         updated_holdings_df.weight = updated_holdings_df.weight + ((100 - updated_holdings_df.weight.sum()) / len(updated_holdings_df.index))
-        #elif drop_change == 'Change out':
-            #    change_choice = st.selectbox('Select the stock to change out', options = initial_holdings_df['ticker'])
-             #   new_stock = st.text_input(f'Stock to replace {change_choice}', 'e.g. SPY')
-             #   updated_holdings_df = initial_holdings_df['ticker'].replace({change_choice : new_stock})
-             #   st.write(updated_holdings_df['ticker'])
         update_analyses = st.form_submit_button('Run analyses on updated portfolio')
         if update_analyses:
             runUpdatedAnalysis(updated_holdings_df, initial_filtered_bar, comparison_std_barplot, combined_sharpe_plot, stacked_bars_plot, initial_portfolio_cum_plot, initial_combined_median_plot, portfolio_intial_distribution_plot)
     with st.form('switch_stock'):
+        
+        
+        change_choices = []
         updated_holdings_df = pd.DataFrame()
-        change_choice = st.selectbox('Select the stock to change out', options = initial_holdings_df['ticker'])
-        new_stock = st.text_input('Stock to replace with', 'e.g. SPY')
         updated_holdings_df = initial_holdings_df
-        updated_holdings_df['ticker'].replace({change_choice : new_stock}, inplace=True)
+        change_choices = st.multiselect('Select up to 3 stocks to change out', options = initial_holdings_df['ticker'])
+        col1, col2, col3 = st.columns(3)
+        col1 = st.text_input('Replacement stock 1')
+        col2 = st.text_input('Replacement stock 2 (if applicable')
+        col3 = st.text_input('Replacement stock 3 (if applicable)')
+        updated_holdings_df['ticker'].replace({change_choices[0] : col1}, inplace=True)
+        if change_choices[1]:
+            updated_holdings_df['ticker'].replace({change_choices[1] : col2}, inplace=True)
+        if change_choices[2]:
+            updated_holdings_df['ticker'].replace({change_choices[2] : col3}, inplace=True)
+
+        if len(change_choices) > 3:
+            st.write('No more than 3 stocks can be replaced')
+            st.stop()
+
+
+
+
         update_analyses = st.form_submit_button('Run analyses on updated portfolio')
         if update_analyses:
-            #st.write(updated_holdings_df)
+            st.write(updated_holdings_df)
             runUpdatedAnalysis(updated_holdings_df, initial_filtered_bar, comparison_std_barplot, combined_sharpe_plot, stacked_bars_plot, initial_portfolio_cum_plot, initial_combined_median_plot, portfolio_intial_distribution_plot)    
     
     
