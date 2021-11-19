@@ -74,16 +74,25 @@ def runUpdatedAnalysis(new_holdings_df, initial_filtered_bar, comparison_std_bar
     #ARKK broken up into individual stocks:
     new_portfolio_df = apf.get_historical_dataframe(new_tickers, start_date, end_date, timeframe)
     #st.write(new_portfolio_df)
+<<<<<<< HEAD
+=======
+
+>>>>>>> a7be19c2d5a86f51dbd4892367d990d47ecfe002
 
 
     # Dividing the weights of our new portfolio stocks by 100
     new_mc_weights = list(new_holdings_df.weight / 100)
     # #display(initial_mc_weights)
+<<<<<<< HEAD
     
     # Establish # of simulations and number of trading days for our MC Simulations -- hard coded for now,
     # could add functionality to take input in the future
     num_simulations = 50
     num_trading_days = 252 * 2 
+=======
+    num_simulations = 25
+    num_trading_days = 252 
+>>>>>>> a7be19c2d5a86f51dbd4892367d990d47ecfe002
 
     # Creating MC Simulation with our newly updated portfolio
     new_portfolio_sim_input = mcf.configure_monte_carlo(new_portfolio_df, new_mc_weights, num_simulations, num_trading_days)
@@ -175,8 +184,11 @@ def runUpdatedAnalysis(new_holdings_df, initial_filtered_bar, comparison_std_bar
     # Creating overlay plot with our initial ARKK and QQQ plot and then adding in the new portfolio plot
     new_combined_median_plot = new_median_initial_plot * initial_combined_median_plot
     #st.bokeh_chart(hv.render(new_median_initial_plot, backend='bokeh'))
+<<<<<<< HEAD
     
     # Rendering to Streamlit
+=======
+>>>>>>> a7be19c2d5a86f51dbd4892367d990d47ecfe002
     st.bokeh_chart(hv.render(new_combined_median_plot, backend = 'bokeh'))
 
 
@@ -188,15 +200,17 @@ def runUpdatedAnalysis(new_holdings_df, initial_filtered_bar, comparison_std_bar
     # this plot will be variable whereas the 'ARKK' and 'QQQ' PLOT
 
     new_distribution_plot = mcf.plot_distribution(new_portfolio_sim_input)
+    st.subheader('Distribution of simulation returns for our updated portfolio')
     st.plotly_chart(new_distribution_plot, sharing="streamlit", title = 'Distribution of cumulative returns across all simulations for the new portfolio')
 
     
     # %%
     # Describe the MCForecast Summary
     new_portfolio_simulation_summary = mcf.get_monte_summary(new_portfolio_sim_input)
+    st.subheader('Summary of returns from the MC simulations on our updated portfolio')
     st.table(new_portfolio_simulation_summary)
     
-    return new_filtered_df, new_portfolio_std_barplot, new_portfolio_sharpe_plot, new_stacked_bars_plot, new_portfolio_cum_plot, new_median_initial_plot, new_distribution_plot, new_portfolio_simulation_summary
+    
 
 
 

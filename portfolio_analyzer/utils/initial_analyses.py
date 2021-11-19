@@ -69,9 +69,18 @@ def runFirstAnalysis():
 
     initial_filtered_bar = initial_filtered_df.hvplot.bar(x='ticker', y = 'weight', hover_color = 'red', rot=90, title = 'Stock tickers and their corresponding weights in the portfolio')
 
+<<<<<<< HEAD
     # For now we are not displaying the below chart in Streamlit for a cleaner presentation, we will be displaying
     # stacked bars chart that incorporates the weights, sharpe ratios, and std
     #st.bokeh_chart(hv.render(initial_filtered_bar, backend='bokeh'))
+=======
+    st.subheader('Initial ARKK portfolio analysis vs. QQQ')
+    
+    st.bokeh_chart(hv.render(initial_filtered_bar, backend='bokeh'))
+
+
+    #display(initial_filtered_df)
+>>>>>>> a7be19c2d5a86f51dbd4892367d990d47ecfe002
 
 
     # %%
@@ -120,8 +129,13 @@ def runFirstAnalysis():
     initial_mc_weights = list(initial_holdings_df.weight / 100)
     
     # #display(initial_mc_weights)
+<<<<<<< HEAD
     num_simulations = 50
     num_trading_days = 252 * 2
+=======
+    num_simulations = 25
+    num_trading_days = 252 
+>>>>>>> a7be19c2d5a86f51dbd4892367d990d47ecfe002
 
     # Creating initial MC Simulation DataFrames
     # For ARKK ETF stocks (before updating)
@@ -243,7 +257,7 @@ def runFirstAnalysis():
                                                                 ylabel = 'Returns', xlabel = 'Date', legend = 'left', fontsize = {'legend' : '8pt'}, frame_height = 250, frame_width = 750)
     # For 'ARKK' as  whole
     arkk_returns_cumprod = (1 + arkk_daily_returns).cumprod()
-    arkk_cum_plot = arkk_returns_cumprod.hvplot(kind = 'line', rot=90, title = 'Cumulative returns for ARKK vs QQQ', ylabel = 'Returns', xlabel = 'Date', label = 'ARKK')
+    arkk_cum_plot = arkk_returns_cumprod.hvplot(kind = 'line', rot=90, title = 'Historical cumulative returns for ARKK vs QQQ', ylabel = 'Returns', xlabel = 'Date', label = 'ARKK', color='blue')
     # For 'QQQ' as a whole
     qqq_returns_cumprod = (1 + qqq_daily_returns).cumprod()
     qqq_cum_plot = qqq_returns_cumprod.hvplot(kind = 'line', rot=90, title = 'Cumulative returns for QQQ', ylabel = 'Returns', xlabel = 'Date', label = 'QQQ')
@@ -275,8 +289,8 @@ def runFirstAnalysis():
     # Plotting the median projected returns via the MCForecast projections
     qqq_median_outcomes = qqq_sim_returns.median(axis=1)
     arkk_intial_median_outcomes = arkk_initial_sim_returns.median(axis=1)
-    qqq_median_plot = qqq_median_outcomes.hvplot(ylabel = 'Median returns', xlabel = 'Days of projection', title = f'Median returns from {num_simulations} simulations over {num_trading_days} trading days for QQQ vs ARKK', label = 'QQQ')
-    arkk_median_initial_plot = arkk_intial_median_outcomes.hvplot(ylabel = 'Median returns', xlabel = 'Days of projection', title = f'Median returns from {num_simulations} simulations over {num_trading_days} trading days for QQQ vs ARKK', label = 'ARKK')
+    qqq_median_plot = qqq_median_outcomes.hvplot(ylabel = 'Median returns', xlabel = 'Days of projection', title = f'Median returns from {num_simulations} simulations over {num_trading_days} trading days for QQQ vs ARKK', label = 'QQQ', color='red')
+    arkk_median_initial_plot = arkk_intial_median_outcomes.hvplot(ylabel = 'Median returns', xlabel = 'Days of projection', title = f'Median returns from {num_simulations} simulations over {num_trading_days} trading days for QQQ vs ARKK', label = 'ARKK', color='blue')
     initial_combined_median_plot = qqq_median_plot * arkk_median_initial_plot
     st.bokeh_chart(hv.render(initial_combined_median_plot, backend='bokeh'))
 
@@ -286,15 +300,26 @@ def runFirstAnalysis():
     # This is the plot for the simulations using the individual stocks within ARKK and can be manipulated...
     # this plot will be variable whereas the 'ARKK' and 'QQQ' PLOT
     portfolio_intial_distribution_plot = mcf.plot_distribution(portfolio_initial_sim_input)
+<<<<<<< HEAD
     st.subheader('ARKK simulation results distribution plot')
     st.plotly_chart(portfolio_intial_distribution_plot)
+=======
+    st.subheader('Distribution plot of simulated returns for ARKK')
+    st.plotly_chart(portfolio_intial_distribution_plot, sharing="streamlit")
+>>>>>>> a7be19c2d5a86f51dbd4892367d990d47ecfe002
 
 
 
     # %%
     qqq_distribution_plot = mcf.plot_distribution(qqq_sim_input)
+<<<<<<< HEAD
     st.subheader('QQQ simulation results distribution plot')
     st.plotly_chart(qqq_distribution_plot)
+=======
+    st.subheader('Distribution plot of simulated returns for QQQ')
+    st.plotly_chart(qqq_distribution_plot, sharing="streamlit", title = 'Distribution of cumulative returns across all simulations for QQQ')
+
+>>>>>>> a7be19c2d5a86f51dbd4892367d990d47ecfe002
 
     
     # %%
@@ -302,11 +327,17 @@ def runFirstAnalysis():
     portfolio_initial_simulation_summary = mcf.get_monte_summary(portfolio_initial_sim_input)
     qqq_simulation_summary = mcf.get_monte_summary(qqq_sim_input)
     
+<<<<<<< HEAD
     # Display tables with the summary data
     st.subheader('Initial portfolio returns summary')
     st.table(portfolio_initial_simulation_summary)
     
     st.subheader('QQQ summary simulation results')
+=======
+    st.subheader('Summary table of Cumulative Returns from our simulations for ARKK')
+    st.table(portfolio_initial_simulation_summary)
+    st.subheader('Summary table of Cumulative Returns from our simulations for QQQ')
+>>>>>>> a7be19c2d5a86f51dbd4892367d990d47ecfe002
     st.table(qqq_simulation_summary)
 
     # Adding in inputs to alter the portfolio for new analyses
@@ -322,7 +353,11 @@ def runFirstAnalysis():
             runUpdatedAnalysis(updated_holdings_df, initial_filtered_bar, comparison_std_barplot, combined_sharpe_plot, stacked_bars_plot, initial_portfolio_cum_plot, initial_combined_median_plot, portfolio_intial_distribution_plot)
     
     with st.form('switch_stock'):
+        
+        
+        change_choices = []
         updated_holdings_df = pd.DataFrame()
+<<<<<<< HEAD
         change_choices = list(st.multiselect('Select the stock(s) to change out', options = initial_holdings_df['ticker']))
         with st.container():
             new_stocks = list(st.text_input('Stocks to replace with', 'e.g. SPY,TLT,QQQ'))
@@ -334,8 +369,33 @@ def runFirstAnalysis():
             
         update_analyses = st.form_submit_button('Run analyses on updated portfolio')
         if update_analyses:
+=======
+        updated_holdings_df = initial_holdings_df
+        change_choices = st.multiselect('Select up to 3 stocks to change out', options = initial_holdings_df['ticker'])
+        col1, col2, col3 = st.columns(3)
+        col1 = st.text_input('Replacement stock 1')
+        col2 = st.text_input('Replacement stock 2 (if applicable)')
+        col3 = st.text_input('Replacement stock 3 (if applicable)')
+        
+
+
+
+
+        update_analyses = st.form_submit_button('Run analyses on updated portfolio')
+        if update_analyses:
+            updated_holdings_df['ticker'].replace({change_choices[0] : col1}, inplace=True)
+            if change_choices[1]:
+                updated_holdings_df['ticker'].replace({change_choices[1] : col2}, inplace=True)
+            if change_choices[2]:
+                updated_holdings_df['ticker'].replace({change_choices[2] : col3}, inplace=True)
+
+            if len(change_choices) > 3:
+                st.write('No more than 3 stocks can be replaced')
+                st.stop()
+            #st.write('Once a stock is dropped the change out stocks function will not work')
+>>>>>>> a7be19c2d5a86f51dbd4892367d990d47ecfe002
             runUpdatedAnalysis(updated_holdings_df, initial_filtered_bar, comparison_std_barplot, combined_sharpe_plot, stacked_bars_plot, initial_portfolio_cum_plot, initial_combined_median_plot, portfolio_intial_distribution_plot)    
-    
+            #st.stop()
     
     #return initial_holdings_df, initial_filtered_bar, comparison_std_barplot, combined_sharpe_plot, stacked_bars_plot, initial_portfolio_cum_plot, initial_combined_median_plot, portfolio_intial_distribution_plot
 
