@@ -1,5 +1,5 @@
 # Module to define Monte Carlo functions that will be utilized repeatedly throughout the project
-import streamlit as st
+
 from MCForecastTools import MCSimulation
 import pandas as pd
 import numpy as np
@@ -9,7 +9,6 @@ import hvplot
 import hvplot.pandas
 
 # Monte Carlo functions
-
 def configure_monte_carlo(dataframe, weights, num_simulations, num_trading_days):
     simulation_input_df = MCSimulation(
     portfolio_data = dataframe,
@@ -18,7 +17,6 @@ def configure_monte_carlo(dataframe, weights, num_simulations, num_trading_days)
     num_trading_days = num_trading_days
     )
     return simulation_input_df
-
 
 def run_monte_carlo(simulation_input_df):
     simulation_returns_df = simulation_input_df.calc_cumulative_return()
