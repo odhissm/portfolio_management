@@ -12,14 +12,12 @@ import sys
 import os
 from alpaca_trade_api.rest import TimeFrame, URL
 import alpaca_trade_api as tradeapi
-import pytz
 import datetime as dt
 import holoviews as hv
 import panel as pn
-import MCForecastTools
-import MonteCarloFunctions as mcf
-import AlpacaFunctions as apf
-from updated_analysis import runUpdatedAnalysis
+import utils.MonteCarloFunctions as mcf
+import utils.AlpacaFunctions as apf
+from utils.updated_analysis import runUpdatedAnalysis
 import datetime as dt
 import hvplot
 import hvplot.pandas
@@ -29,8 +27,6 @@ import plotly.express as px
 import bokeh
 import streamlit as st
 
-# %% [markdown]
-# **Below we are going to define functions we will be using repeatedly within the project -- will probably need to be moved to a separate .py file in order to "modularize" our app.  We will then be able to import the relevant functions from the separate file.    # Def function that will be the loop of the app.  Takes a newPortfolioData parameter that will run our analyses on the new portfolio data that results from user input
 
 def runFirstAnalysis():
     # %%
@@ -40,19 +36,14 @@ def runFirstAnalysis():
     holdings_url = 'https://arkfunds.io/api/v2/etf/holdings'  
 
     #Initial API call to establish current positions for ARKK
-    # need to code for an error response if API call is unsuccessfsul i.e. i.e.response.status_code == 200:
+    # need to code for an error response if API call is unsuccessfsul i.e. i.e.response.status_code == 200: -- for future iterations
     response = requests.get(holdings_url, params = {'symbol' : 'ARKK'}).json()        #print(json.dumps(response, indent=4, sort_keys=True))
     # %% [markdown]
-    # **Something for us to consider -- would it be better to utilize dataframes or databases to manipulate and analyze our data?
+    # **Something for us to consider -- would it be better to utilize dataframes or databases to manipulate and analyze our data? -- we have a baseline coded for database interaction if we decide to do so in the future
 
     # %%
     # We want to create a dataframe with the relevant 'holdings' data from the json object returned above
     initial_holdings_df = pd.DataFrame(response['holdings']).dropna(axis=0)
-
-    
-
-    #Check to confirm we have dropped null values in our DataFrame
-    #display(initial_holdings_df.isnull().sum())
 
     # %% [markdown]
     # **To be done for project -- we need to find a solution for null values in our holdings dataframe as it could change and we do not necessarily want to have to dig in and figure out which value is null and what belongs there... possibly create an if/then statement for null values and how to handle them i.e. alert the user of the null value and provide options for  how to handle it.  For the purposes of our MVP, we are going to drop rows with null values since the recurring null value is for a ticker with very little impact on the portfolio.  For future consideration would be a more elegant way to handle null values, but for now we will simply drop them.  NOTE:  this will cause our weights to not equal 100, thus we must rebalance the weights so we can run our calculations.
@@ -70,8 +61,6 @@ def runFirstAnalysis():
     st.bokeh_chart(hv.render(initial_filtered_bar, backend='bokeh'))
 
 
-    #display(initial_filtered_df)
-
 
     # %%
     #Use data from ARKK API call to get historical quotes from Alpaca
@@ -81,7 +70,7 @@ def runFirstAnalysis():
     today = pd.Timestamp.now(tz="America/New_York")
     three_years_ago = pd.Timestamp(today - pd.Timedelta(days=1095)).isoformat()
     end_date = today
-    # Do we want to use 1, 2, 3 years of historical data or more?
+    # Do we want to use 1, 2, 3 years of historical data or more? -- for now we will use 3 years
     start_date = three_years_ago
     # Here we are retrieving the historical data for the stocks in the ARKK portfolio.  
     # We then filter the results to leave us with closing price and ticker columns with a datetime index 
@@ -97,13 +86,7 @@ def runFirstAnalysis():
     #QQQ for comparison purposes
     qqq_df = apf.get_historical_dataframe('QQQ', start_date, end_date, timeframe)
 
-    # %% [markdown]
-    # **TBD for project -- how will we handle timeframes for our historical analyses i.e. do we want a hard coded time period or allow for user input?  Also how will this affect stocks that have no data for certain periods as well as those who have a more extensive price history.
-    # %% [markdown]
-    # **One thing to consider for our daily returns calculations.. it's possible we can just set up the Monte Carlo simulation and then pull the returned daily returns to use in our risk/return analyses -- YES WE CAN!
-    # %% [markdown]
-    # **Below we create functions for the monte carlo simulations... these will probably need to be separated into a separate module.
-
+   
     # %%
     # In order to use the weights from the portfolio dataframe in our Monte Carlo simulations, we will need to divide them by 100.
     # Initially we use the weights we received from our API call to retrieve ARKK's holdings -- 
@@ -287,19 +270,23 @@ def runFirstAnalysis():
     # Adding in inputs to alter the portfolio for new analyses
     st.subheader('Please select below if you would like to drop or change any stocks to see how it would affect the portfolio:')
     
+    # Here we are creating a 'form' within Streamlit to isolate the drop_stock functionality
     with st.form('drop_stock'):
-        #drop_change = st.selectbox('Would you like to drop or change out a stock?', ('Drop', 'Change out'))
-        #if drop_change == 'Drop':
         updated_holdings_df = pd.DataFrame()
+        # Allowing the user to choose which stock to drop
         drop_choice = st.selectbox('Select the stock to drop', options=initial_holdings_df['ticker'])
+        # Updating the portfolio and weights
         updated_holdings_df = initial_holdings_df[initial_holdings_df.ticker != drop_choice]
         updated_holdings_df.weight = updated_holdings_df.weight + ((100 - updated_holdings_df.weight.sum()) / len(updated_holdings_df.index))
         update_analyses = st.form_submit_button('Run analyses on updated portfolio')
+        # If run analyses button is clicked, run the following:
         if update_analyses:
             runUpdatedAnalysis(updated_holdings_df, initial_filtered_bar, comparison_std_barplot, combined_sharpe_plot, stacked_bars_plot, initial_portfolio_cum_plot, initial_combined_median_plot, portfolio_intial_distribution_plot)
-    with st.form('switch_stock'):
-        
-        
+            updated_holdings_df = initial_holdings_df
+    
+    # Here we are creating a 'form' within Streamlit to isolate the drop_stock functionality
+    with st.form('switch_stock', clear_on_submit=True):
+        # Creating the framework for allowing up to 3 stocks to be switched out from our intial portfolio
         change_choices = []
         updated_holdings_df = pd.DataFrame()
         updated_holdings_df = initial_holdings_df
@@ -309,28 +296,24 @@ def runFirstAnalysis():
         col2 = st.text_input('Replacement stock 2 (if applicable)')
         col3 = st.text_input('Replacement stock 3 (if applicable)')
         
-
-
-
-
+        # If analyze portfolio button is clicked, switch out the stocks, re-run the simulations, and then clear the form
         update_analyses = st.form_submit_button('Run analyses on updated portfolio')
         if update_analyses:
             updated_holdings_df['ticker'].replace({change_choices[0] : col1}, inplace=True)
-            if change_choices[1]:
+            if col2 != '':
                 updated_holdings_df['ticker'].replace({change_choices[1] : col2}, inplace=True)
-            if change_choices[2]:
+            if col3 != '':
                 updated_holdings_df['ticker'].replace({change_choices[2] : col3}, inplace=True)
 
+            # If the user tries to select more than 3 stocks to replace, throw an error and stop the program.
             if len(change_choices) > 3:
                 st.write('No more than 3 stocks can be replaced')
-                st.stop()
-            #st.write('Once a stock is dropped the change out stocks function will not work')
+                st.stop()            
+            
             runUpdatedAnalysis(updated_holdings_df, initial_filtered_bar, comparison_std_barplot, combined_sharpe_plot, stacked_bars_plot, initial_portfolio_cum_plot, initial_combined_median_plot, portfolio_intial_distribution_plot)    
-            #st.stop()
-    
-    #return initial_holdings_df, initial_filtered_bar, comparison_std_barplot, combined_sharpe_plot, stacked_bars_plot, initial_portfolio_cum_plot, initial_combined_median_plot, portfolio_intial_distribution_plot
-
-
+            updated_holdings_df = initial_holdings_df
+        
+# One thing we did not get to is creating a better 'main' app layout that would further modularize the app
 
 
 runFirstAnalysis()

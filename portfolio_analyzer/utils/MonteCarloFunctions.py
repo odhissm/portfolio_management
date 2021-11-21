@@ -1,12 +1,10 @@
 # Module to define Monte Carlo functions that will be utilized repeatedly throughout the project
 
-from MCForecastTools import MCSimulation
+from utils.MCForecastTools import MCSimulation
 import pandas as pd
 import numpy as np
-import plotly as pty
-import plotly.express as px
-import hvplot
-import hvplot.pandas
+
+
 
 # Monte Carlo functions
 def configure_monte_carlo(dataframe, weights, num_simulations, num_trading_days):
