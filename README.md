@@ -103,7 +103,7 @@ import streamlit as st
 
 ## Usage
 
-### There are two facets to the initial version of this application -- the first is a jupyter notebook that contains our intial codebase as well as visualizations and commentary on the code.  The second is our initial_analyses.py which is run with Streamlit that provides enhanced visualizations as well as interactivity to engage with portfolio exploration.**  
+### There are two facets to the initial version of this application -- the first is a jupyter notebook that contains our intial codebase as well as visualizations and commentary on the code.  The second is our initial_analyses.py which is run with Streamlit that provides enhanced visualizations as well as interactivity to engage with portfolio exploration.  The root directory for the application is the /portfolio_analyzer folder**  
 
 ### Jupyter Notebook  
 
@@ -114,14 +114,14 @@ In order to maximize the full features of the application, a Streamlit server sh
 
 *From the terminal:*  
 
-`streamlit run initial_analyses.py`  -- Ensure that you are in the root directory where this file is located before running the command.  
+`streamlit run initial_analyses.py`  -- Ensure that you are in the root directory where this file is located and that you have installed the streamlit library before running the command.  
 
-**If you encounter difficulties running Streamlit, possible server errors are discussed [here](https://docs.streamlit.io/knowledge-base/deploy/remote-start).  Their reference docs on the main site cover an extensive amount of questions as well.
+**If you encounter difficulties running Streamlit, possible server errors are discussed [here](https://docs.streamlit.io/knowledge-base/deploy/remote-start).  Their reference docs on the main site cover an extensive amount of questions as well.**
 
 
-**The basic flow of the application is as follows --  
+**The basic flow of the application is as follows** --  
 
-1.  ARKK's current holdings are accessed from the ARKK holdings API, and then filtered to display tickers, weights and company names.  These holdings are then passed to the Alpaca API to retrieve historical price data.  
+1.  ARKK's current holdings are accessed from the [ARKK holdings API](https://arkfunds.io/api/v2/etf/holdings), and then filtered to display tickers, weights and company names.  These holdings are then passed to the Alpaca API to retrieve historical price data.  
 
 2.  Once ARKK's current holdings have been imported, initial analyses are run on the portfolio to assess risk, return and projection metrics vs. the QQQ index.  
 
@@ -131,15 +131,15 @@ In order to maximize the full features of the application, a Streamlit server sh
 
 ### A comparison of the simulated returns for the initial ARKK portfolio, QQQ, and an updated portfolio after exchanging stocks --  
 
-![Comparison chart1](./resources/comparison_overlay.png)  
+![Comparison chart1](portfolio_analyzer/resources/comparison_overlay.png)  
 
 ### A distribution chart illustrating returns from a new simulated portfolio --  
 
-![Distribution plot](./resources/distribution.png)  
+![Distribution plot](portfolio_analyzer/resources/distribution.png)  
 
 ###  A stacked bar chart with standard deviation and sharpe ratios --  
 
-![Stacked Bar](./resources/stacked_bars.png)  
+![Stacked Bar](portfolio_analyzer\resources\stacked_bars.png)  
 
 In future iterations we plan to expand on the functionality to allow for more manipulation of not only the ARKK portfolio but others as well, engage with SQLAlchemy to provide database flexibility and potentially even make suggestions for stock additions / exchanges that would optimize a portfolio based on a users risk tolerance, etc.
 
