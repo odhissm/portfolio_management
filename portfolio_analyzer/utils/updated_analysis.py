@@ -16,8 +16,8 @@ import pytz
 import datetime as dt
 import holoviews as hv
 import panel as pn
-import MonteCarloFunctions as mcf
-import AlpacaFunctions as apf
+import utils.MonteCarloFunctions as mcf
+import utils.AlpacaFunctions as apf
 import datetime as dt
 import hvplot
 import hvplot.pandas
