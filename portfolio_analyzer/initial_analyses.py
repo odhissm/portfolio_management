@@ -3,13 +3,10 @@
 # %%
 #Import modules
 
+
 import pandas as pd
 import requests
 import numpy as np
-import json
-from dotenv import load_dotenv
-import sys
-import os
 from alpaca_trade_api.rest import TimeFrame, URL
 import alpaca_trade_api as tradeapi
 import datetime as dt
@@ -29,10 +26,12 @@ import streamlit as st
 
 
 def runFirstAnalysis():
+    
+    st.set_page_config(menu_items={'About' : 'For more information on the functionality and codebase of this app, please visit our GitHub repository at https://github.com/odhissm/portfolio_management'})
+    
     # %%
     #Establish ARK API variables -- base url for api calls, request type i.e. profile, trades, etc., etf_symbol for desired etf and additional arguments as parameters
     
-    holdings_symbol = 'ARKK'
     holdings_url = 'https://arkfunds.io/api/v2/etf/holdings'  
 
     #Initial API call to establish current positions for ARKK
@@ -54,10 +53,10 @@ def runFirstAnalysis():
 
     # Note that for our Monte Carlo simulations, we will need to divide the weights column by 100 since the sum of weights for the simulation needs to be 1, and the dataframe is configured for the sum to be 100.
 
-    initial_filtered_bar = initial_filtered_df.hvplot.bar(x='ticker', y = 'weight', hover_color = 'red', rot=90, title = 'Stock tickers and their corresponding weights in the portfolio')
-
-    st.subheader('Initial ARKK portfolio analysis vs. QQQ')
+    st.header('Initial ARKK portfolio analysis vs. QQQ')
+    st.markdown('**For more information on the functionality and codebase of this project, please visit our GitHub repository at https://github.com/odhissm/portfolio_management')
     
+    initial_filtered_bar = initial_filtered_df.hvplot.bar(x='ticker', y = 'weight', hover_color = 'red', rot=90, title = 'Stock tickers and their corresponding weights in the portfolio')
     st.bokeh_chart(hv.render(initial_filtered_bar, backend='bokeh'))
 
 
@@ -226,11 +225,7 @@ def runFirstAnalysis():
     qqq_sim_returns = mcf.run_monte_carlo(qqq_sim_input)
 
     
-    # %%
-    initial_return_totals = pd.DataFrame(arkk_initial_sim_returns.iloc[-1, :])
-    #display(initial_return_totals)
-
-    # %%
+    
     # Plotting the median projected returns via the MCForecast projections
     qqq_median_outcomes = qqq_sim_returns.median(axis=1)
     arkk_intial_median_outcomes = arkk_initial_sim_returns.median(axis=1)
@@ -244,16 +239,19 @@ def runFirstAnalysis():
     # Plotting distribrution and confidence intervals from Monte Carlo Simulation
     # This is the plot for the simulations using the individual stocks within ARKK and can be manipulated...
     # this plot will be variable whereas the 'ARKK' and 'QQQ' PLOT
+    
+    col1, col2 = st.columns(2)
+
     portfolio_intial_distribution_plot = mcf.plot_distribution(portfolio_initial_sim_input)
-    st.subheader('Distribution plot of simulated returns for ARKK')
-    st.plotly_chart(portfolio_intial_distribution_plot, sharing="streamlit")
+    col1.markdown('**Distribution plot of simulated returns for ARKK**')
+    col1.plotly_chart(portfolio_intial_distribution_plot, sharing="streamlit", use_container_width=True)
 
 
 
     # %%
     qqq_distribution_plot = mcf.plot_distribution(qqq_sim_input)
-    st.subheader('Distribution plot of simulated returns for QQQ')
-    st.plotly_chart(qqq_distribution_plot, sharing="streamlit", title = 'Distribution of cumulative returns across all simulations for QQQ')
+    col2.markdown('**Distribution plot of simulated returns for QQQ**')
+    col2.plotly_chart(qqq_distribution_plot, sharing="streamlit", title = 'Distribution of cumulative returns across all simulations for QQQ', use_container_width=True)
 
 
     
@@ -261,14 +259,17 @@ def runFirstAnalysis():
     # Describe the MCForecast Summary
     portfolio_initial_simulation_summary = mcf.get_monte_summary(portfolio_initial_sim_input)
     qqq_simulation_summary = mcf.get_monte_summary(qqq_sim_input)
+
+    col1, col2 = st.columns(2)
     
-    st.subheader('Summary table of Cumulative Returns from our simulations for ARKK')
-    st.table(portfolio_initial_simulation_summary)
-    st.subheader('Summary table of Cumulative Returns from our simulations for QQQ')
-    st.table(qqq_simulation_summary)
+    col1.markdown('**Summary table of Cumulative Returns from our simulations for ARKK**')
+    col1.table(portfolio_initial_simulation_summary)
+    col2.markdown('**Summary table of Cumulative Returns from our simulations for QQQ**')
+    col2.table(qqq_simulation_summary)
 
     # Adding in inputs to alter the portfolio for new analyses
-    st.subheader('Please select below if you would like to drop or change any stocks to see how it would affect the portfolio:')
+    st.markdown('**Please select below if you would like to drop or change any stocks to see how it would affect the portfolio.  Charts above will update with new analyses as well.**')
+    
     
     # Here we are creating a 'form' within Streamlit to isolate the drop_stock functionality
     with st.form('drop_stock'):
@@ -290,20 +291,19 @@ def runFirstAnalysis():
         change_choices = []
         updated_holdings_df = pd.DataFrame()
         updated_holdings_df = initial_holdings_df
-        change_choices = st.multiselect('Select up to 3 stocks to change out', options = initial_holdings_df['ticker'])
-        col1, col2, col3 = st.columns(3)
-        col1 = st.text_input('Replacement stock 1')
-        col2 = st.text_input('Replacement stock 2 (if applicable)')
-        col3 = st.text_input('Replacement stock 3 (if applicable)')
+        change_choices = st.multiselect('Select up to 3 stocks to change out. Input as ticker with no quotes i.e. SPY, TLT, etc.  Number of stocks to replace must equal number of replacements.', options = initial_holdings_df['ticker'])
+        text1 = st.text_input('Replacement stock 1')
+        text2 = st.text_input('Replacement stock 2 (if applicable)')
+        text3 = st.text_input('Replacement stock 3 (if applicable)')
         
         # If analyze portfolio button is clicked, switch out the stocks, re-run the simulations, and then clear the form
         update_analyses = st.form_submit_button('Run analyses on updated portfolio')
         if update_analyses:
-            updated_holdings_df['ticker'].replace({change_choices[0] : col1}, inplace=True)
-            if col2 != '':
-                updated_holdings_df['ticker'].replace({change_choices[1] : col2}, inplace=True)
-            if col3 != '':
-                updated_holdings_df['ticker'].replace({change_choices[2] : col3}, inplace=True)
+            updated_holdings_df['ticker'].replace({change_choices[0] : text1}, inplace=True)
+            if text2 != '':
+                updated_holdings_df['ticker'].replace({change_choices[1] : text2}, inplace=True)
+            if text3 != '':
+                updated_holdings_df['ticker'].replace({change_choices[2] : text3}, inplace=True)
 
             # If the user tries to select more than 3 stocks to replace, throw an error and stop the program.
             if len(change_choices) > 3:
