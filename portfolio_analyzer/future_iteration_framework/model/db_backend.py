@@ -267,8 +267,8 @@ def delete_one(conn, ticker, table_name):
             .format(ticker, table_name))        
         
     
-def import_portfolio_holding(holdings_symbol, holdings_url):
-        
+#def import_portfolio_holding(holdings_symbol, holdings_url):
+def import_portfolio_holding(holdings_symbol, holdings_url):        
     # make an API call to get the jason file of the holding and store in a variable 'response'
     response = requests.get(holdings_url, params = {'symbol' : holdings_symbol}).json()
     
@@ -279,4 +279,41 @@ def import_portfolio_holding(holdings_symbol, holdings_url):
     holdings_ticker_weight_df = holdings_df[['ticker', 'weight', 'company']]
     
     return holdings_ticker_weight_df
+    
+
+# function to import portfolio of the funds and clean up data   
+def import_fund_holdings(holdings_symbol):
+    #use the corresponding fund url, but will just use aRKK for all four funds for now
+    #global initial_holdings_df
+    #initial_holdings_df = ""
+    if (holdings_symbol == 'ARKK'):
+        holdings_url = 'https://arkfunds.io/api/v2/etf/holdings' 
+        
+    elif (holdings_symbol == 'YOLO'):
+         holdings_url = 'https://arkfunds.io/api/v2/etf/holdings'
+    
+    elif (holdings_symbol == 'MSOS'):
+        holdings_url = 'https://arkfunds.io/api/v2/etf/holdings'
+    
+    elif (holdings_symbol == 'IVY'):
+        holdings_url = 'https://arkfunds.io/api/v2/etf/holdings'
+        
+    else:
+        holdings_url = 'https://arkfunds.io/api/v2/etf/holdings'
+        
+        
+    funds_portfolio_holdings = requests.get(holdings_url, params = {'symbol' : holdings_symbol}).json()
+    
+    # Create a dataframe of the holding response
+    initial_holdings_df = pd.DataFrame(funds_portfolio_holdings['holdings']).dropna(axis=0)
+    
+    #df = local_holdings_df.isnull().sum()
+    
+    #if (df.sum() != 0):
+    #    initial_holdings_df = local_holdings_df
+    #    display(initial_holdings_df)
+    #
+    
+    return initial_holdings_df
+    
     
